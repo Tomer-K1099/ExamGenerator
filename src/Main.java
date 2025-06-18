@@ -23,7 +23,7 @@ public class Main {
 	public static void main(String[] args) throws IOException {
 		final String INVALID = "Invalid value\n";
 		final int EXIT = 0;
-		 UserDAO userDAO = new UserDAO();
+		 UserSQL UserSQL = new UserSQL();
 		 User user = null;
 		  int choice;
 		  boolean userConect = false;
@@ -50,7 +50,7 @@ public class Main {
 		            String password = s.nextLine();
 		            
 		            
-		            if (userDAO.validateUser(conn, username, password)) {
+		            if (UserSQL.validateUser(conn, username, password)) {
 	                    System.out.println("Login successful!");
 	                    user = new User(username, password);
 	                    userConect = true;
@@ -64,13 +64,13 @@ public class Main {
 		        	
 		        	
 		        	
-		            if (userDAO.usernameExists(conn, username)) {
+		            if (UserSQL.usernameExists(conn, username)) {
 	                    System.out.println("Username already exists. Please choose a different one.");
 	                } else {
 	                    System.out.println("Enter a password:");
 	                    String password = s.nextLine();
 	                    User newUser = new User(username, password);
-	                    userDAO.registerUser(conn, newUser);
+	                    UserSQL.registerUser(conn, newUser);
 	                    System.out.println("Registration successful!");
 	                    userConect = true;
 	                }
@@ -239,7 +239,7 @@ public class Main {
 						int ans = s.nextInt(); //question type
 						try {
 							Connection conn = DatabaseManager.getConnection();
-							QuestionDAO questionDAO = new QuestionDAO(conn);
+							QuestionSQL QuestionSQL = new QuestionSQL(conn);
 							AnswerSQL ansDB = new AnswerSQL(conn);
 
 							switch(ans) {
@@ -254,7 +254,7 @@ public class Main {
 
 
 										// Save question to the database
-										questionDAO.save(question, questionRepository.getSubject());
+										QuestionSQL.save(question, questionRepository.getSubject());
 										System.out.println("Question successfully added to repository and database\n");
 									}
 
@@ -274,7 +274,7 @@ public class Main {
 										Question question = questionRepository.allQuestions[questionRepository.numOfAllQustiones-1];
 
 										// Save question to the database
-										questionDAO.save(question, questionRepository.getSubject());
+										QuestionSQL.save(question, questionRepository.getSubject());
 										System.out.println("Question successfully added to repository and database\n");
 									}
 									else
@@ -509,7 +509,7 @@ public class Main {
 							Connection conn2 = DatabaseManager.getConnection();
 							boolean flag = false;
 							do {
-								QuestionDAO answerdao_2 = new QuestionDAO(conn2);
+								QuestionSQL answerdao_2 = new QuestionSQL(conn2);
 								for(int i =0;i<questionRepository.numOfAllQustiones;i++) {
 									if(questionRepository.allQuestions[i] == null)
 										break;
@@ -529,7 +529,7 @@ public class Main {
 							Connection conn2 = DatabaseManager.getConnection();
 							boolean flag = false;
 							do {
-								QuestionDAO answerdao_2 = new QuestionDAO(conn2);
+								QuestionSQL answerdao_2 = new QuestionSQL(conn2);
 								Question qTry = answerdao_2.findById(2);
 								System.out.println(qTry);
 								conn2.close();

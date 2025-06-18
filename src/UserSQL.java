@@ -5,7 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class UserDAO {
+public class UserSQL {
 
     // Check if username exists in the database
     public boolean usernameExists(Connection conn, String username) throws SQLException {

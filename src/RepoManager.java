@@ -70,7 +70,7 @@ public class RepoManager {
    {
 	   this.numRepositories = countSubjects(conn);
 	   List<String> subjectName = getAllSubjectNames(conn);
-	   QuestionDAO q_DAO = new QuestionDAO(conn);
+	   QuestionSQL q_DAO = new QuestionSQL(conn);
 	   for(int i = 0;i<this.numRepositories;i++)
 	   {
 		this.repositories[i] = new QuestionesRepository(subjectName.get(i));

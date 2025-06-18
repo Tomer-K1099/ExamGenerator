@@ -7,10 +7,10 @@ import java.sql.SQLException;
 
 //import static db_proj.MultipleChoiceQuestion.MAX_NUM_OF_ANSWERS;
 
-public class QuestionDAO {
+public class QuestionSQL {
     private Connection connection;
 
-    public QuestionDAO(Connection connection) {
+    public QuestionSQL(Connection connection) {
         this.connection = connection;
     }
 
