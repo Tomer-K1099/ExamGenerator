@@ -34,7 +34,7 @@ public class AutomaticExam extends Exam {
 					continue;
 				}
 				
-				if(!this.addQuestionInExam(question)) {//if this question is alredy exist
+				if(!this.addQuestionInExam(question)) {//if this question already exist
 					continue;
 				}
 
@@ -78,7 +78,19 @@ public class AutomaticExam extends Exam {
 			
 			
 		}
-		this.saveTestToDataBase(conn,testID,idList);
+//		for(int id : idList) {
+//			System.out.println(id);
+//		}
+		boolean is_ok = true;
+		try {
+			this.saveTestToDataBase(conn, testID, idList);
+		} catch (SQLException e) {
+			System.out.println("Error while saving to database" + e.getMessage());
+			is_ok = false;
+		}
+		if(is_ok) {
+		System.out.println("All questions have been saved successfully");
+		}
 
 	}
 

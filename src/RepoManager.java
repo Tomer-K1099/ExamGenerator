@@ -5,6 +5,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.sql.Connection;
@@ -36,7 +37,7 @@ public class RepoManager {
 		QuestionesRepository[] repositories = (QuestionesRepository[])file.readObject();
 		file.close();
 		return repositories;
-		}
+	}
 
 
 	public void initRepositories() throws IOException, ClassNotFoundException {
@@ -49,8 +50,8 @@ public class RepoManager {
 		repositories[2] = new QuestionesRepository("create new repository");
 		numRepositories = 3;
 		saveRepositories(repositories, "repository.dat");
-//		
-		// read repositories from binary file
+
+//		 read repositories from binary file
 		repositories = loadRepositories("repository.dat");
 		boolean found = false;
 		for (int i = 0; i < DEAFULT_SIZE; i++) {
@@ -63,7 +64,7 @@ public class RepoManager {
 		if (!found) {
 			numRepositories = DEAFULT_SIZE;
 		}
-		
+
    }
 
    public void initRepositoriesFromDB(Connection conn) throws SQLException
@@ -128,6 +129,45 @@ public class RepoManager {
 		return count;
 	}
 
+	public int countAnswersForQuestion(Connection conn, Question question) throws SQLException {
+		String sql = "SELECT COUNT(ans.answer_id) " +
+				"FROM public.multiple_choice_answers ans "+
+				"WHERE question_id = ?";
+		int count = 0;
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setInt(1, question.getId());
+			ResultSet rs = pstmt.executeQuery();
+			if(rs.next()){
+				count = rs.getInt(1);
+			}
+
+		} catch(SQLException e) {
+			System.out.println("Something went wrong while counting answers for question number " + question.getId() + ':' +  e.getMessage());
+		}
+		return count;
+	}
+
+	public ArrayList<String> getAnswersForQuestion(Connection conn, Question question) throws SQLException {
+		String sql = "SELECT ans.answer_description " +
+				"FROM public.answers ans "+
+				"INNER JOIN public.multiple_choice_answers mult_ans ON ans.question_id = mult_ans.question_id "+
+				"WHERE question_id = ?";
+		ArrayList<String> answer_descriptions =  new ArrayList<String>();
+		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
+			pstmt.setInt(1, question.getId());
+			ResultSet rs = pstmt.executeQuery();
+			while(rs.next()){
+				String answer_desc = rs.getString(1);
+				answer_descriptions.add(answer_desc);
+			}
+
+		} catch(SQLException e) {
+			System.out.println("Something went wrong while fetching answers for question number " + question.getId() + ':' + e.getMessage());
+		}
+		return answer_descriptions;
+
+
+}
 
 	public int countAnswers(Connection conn, String subjectname) throws SQLException {
 		String sql = "SELECT COUNT(an.answer_id) " +
@@ -223,6 +263,47 @@ public class RepoManager {
 //		repositories[numRepositories-1] = new QuestionesRepository(newRepoSubject);
 //		repositories[numRepositories++] = new QuestionesRepository("create new repository");
 //		return true;
+	}
+
+	public int WriteSingleRepoToDatabase(Connection conn, QuestionesRepository repo) throws SQLException {
+		AnswerSQL ans_db = new AnswerSQL(conn);
+		QuestionSQL question_db = new QuestionSQL(conn);
+		String insert_subject = "INSERT INTO subjects (subject_name) VALUES (?)";
+		try(PreparedStatement pstmt = conn.prepareStatement(insert_subject)) {
+			pstmt.setString(1, repo.getSubject());
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			System.out.println("Error occurred while adding new subject to the database: " + e.getMessage());
+			return 0;
+
+		}
+		for(int i=0 ; i<repo.getNumOfAnswers(); i++){
+			try{
+				ans_db.save(repo.getAllAnswers()[i], repo.getSubject());
+			}
+			catch (SQLException e) {
+				System.out.println("Error occurred while adding new answer to the database: " + e.getMessage());
+				return 0;
+			}
+		}
+		for(int i=1 ; i<=repo.getNumOfAllQustiones(); i++){
+			try{
+				question_db.save(repo.getQuestionByNumber(i), repo.getSubject());
+			}
+			catch (SQLException e) {
+				System.out.println("Error occurred while adding new question to the database: " + e.getMessage());
+				return 0;
+
+			}
+		}
+		return 1;
+	}
+	public void WriteReposToDatabase(Connection conn) throws SQLException {
+		if (countSubjects(conn) == 0) {
+			for (int i = 0; i < numRepositories - 1; i++) {
+				WriteSingleRepoToDatabase(conn, repositories[i]);
+			}
+		}
 	}
 
 

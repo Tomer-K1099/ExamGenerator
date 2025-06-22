@@ -17,7 +17,7 @@ public abstract class Exam implements Examable {
 	protected int numOfQustionInExam;
 	protected Answer noAnswer;
 	protected int amountOfWantQuestions;
-	public static final int MAX_OF_QUESTIONS_ALLOW=3;
+	public static final int MAX_OF_QUESTIONS_ALLOW=5;
 	public static final int  MINIMUM_ANSSWERS_IN_QUESTION = 4;
 	
 	public Exam(int amountOfWantQuestions) {
@@ -36,7 +36,7 @@ public abstract class Exam implements Examable {
 
 		try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
 			for (Integer id : idList) {
-				System.out.println(id);
+//				System.out.println(id);
 				pstmt.setInt(1, testID);
 				pstmt.setInt(2, id.intValue());
 				pstmt.executeUpdate(); // Execute each insertion individually

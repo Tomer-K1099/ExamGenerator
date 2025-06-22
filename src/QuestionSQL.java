@@ -20,10 +20,10 @@ public class QuestionSQL {
 
         if (question instanceof OpenQuestion) {
             // Insert into OpenQuestions
-            sql = "INSERT INTO open_questions (question_description, difficulty_level, subject, right_answer) VALUES (?, ?, ?, ?) RETURNING question_id";
+            sql = "INSERT INTO openquestions (question_description, difficulty_level, subject, right_answer) VALUES ( ?, ?, ?, ?) RETURNING question_id";
         } else if (question instanceof MultipleChoiceQuestion) {
             // Insert into MultipleChoice
-            sql = "INSERT INTO multiple_choice_questions (question_description, difficulty_level, subject, number_of_answers) VALUES (?, ?, ?, ?) RETURNING question_id";
+            sql = "INSERT INTO multiplechoice (question_description, difficulty_level, subject, number_of_answers) VALUES ( ?, ?, ?, ?) RETURNING question_id";
         } else {
             throw new IllegalArgumentException("Invalid question type: " + question.getClass().getName());
         }
@@ -84,7 +84,7 @@ public class QuestionSQL {
 
 
     private OpenQuestion findOpenQuestionById(int id) throws SQLException {
-        String sql = "SELECT * FROM open_questions WHERE question_id = ?";
+        String sql = "SELECT * FROM openquestions WHERE question_id = ?";
         OpenQuestion openQuestion = null;
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -106,7 +106,7 @@ public class QuestionSQL {
     }
 
     private MultipleChoiceQuestion findMultipleChoiceQuestionById(int id) throws SQLException {
-        String sql = "SELECT * FROM multiple_choice_questions WHERE question_id = ?";
+        String sql = "SELECT * FROM multiplechoice WHERE question_id = ?";
         MultipleChoiceQuestion multipleChoice = null;
 
         try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
@@ -149,6 +149,18 @@ public class QuestionSQL {
         return multipleChoice;
     }
 
+    public int getId(Question question) throws SQLException {
+        String sql = "SELECT question_id FROM questions WHERE question_description = ?";
+        int id = 0;
+        try (PreparedStatement pstmt = connection.prepareStatement(sql)) {
+            pstmt.setString(1,question.getQuestionDescription());
+            ResultSet rs = pstmt.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("question_id");
+            }
+        }
+        return id;
+    }
 
 
 

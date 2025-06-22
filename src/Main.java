@@ -8,13 +8,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.InputMismatchException;
-import java.util.List;
-import java.util.ArrayList;
+import java.util.*;
 //import java.text.SimpleDateFormat;
 //import java.util.Calendar;
 //import java.util.Date;
-import java.util.Scanner;
+
 
 public class Main {
 
@@ -34,7 +32,6 @@ public class Main {
 		        System.out.println("Welcome! Please choose an option:");
 		        System.out.println("1. Log in");
 		        System.out.println("2. Register");
-		        
 		        choice = s.nextInt();
 		        s.nextLine(); // Consume newline
 		        
@@ -82,7 +79,6 @@ public class Main {
 
 	    conn.close();    
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
                
@@ -90,17 +86,24 @@ public class Main {
 		 
 		RepoManager repositoriesManager = new RepoManager();
 		try {
-			Connection conn = DatabaseManager.getConnection();
-			//repositoriesManager.initRepositoriesFromDB(conn);
 			repositoriesManager.initRepositories();
-			conn.close();
+
 		} catch (Exception e) {
 			System.out.println("Could not find initialization file..");
 		}
+		try {
+			Connection conn = DatabaseManager.getConnection();
+//			repositoriesManager.initRepositoriesFromDB(conn);
+			repositoriesManager.WriteReposToDatabase(conn);
+			conn.close();
+		}catch(SQLException e) {
+			System.out.println("Error occured while initializing the database.");
+		}
+
 		int index = -1;
 		while(true){
 			
-			System.out.println("Please choose the subject of the repsitory");
+			System.out.println("Please choose repository subject");
 			System.out.println(repositoriesManager.toString());
 			System.out.println("To Exit press--> 0");
 			index = s.nextInt();
@@ -134,19 +137,24 @@ public class Main {
 			final int OP6 = 6;
 			final int OP7 = 7;
 			final int OP8 = 8;
+			final int OP9 = 9;
+			final int OP10 = 10;
+			final int OP11 = 11;
+			final int OP12 = 12;
+			final int OP13 = 13;
 			
 			
 			do {
-				showManu();
+				showMenu(questionRepository.getSubject());
 				choice = s.nextInt();
 				switch (choice) {
-				case OP1:
-					System.out.println(questionRepository);
-					break;
+					case OP1:
+						System.out.println(questionRepository);
+						break;
 
 					case OP2:
 						s.nextLine();
-						System.out.println("Write the answer you want to enter");
+						System.out.println("Enter Answer Description: ");
 						String answerDescription = s.nextLine();
 						try {
 							Connection conn = DatabaseManager.getConnection();
@@ -154,7 +162,7 @@ public class Main {
 							Answer newAnswer = new Answer(answerDescription);
 							ansDB.save(newAnswer,questionRepository.getSubject());
 							if (questionRepository.addAnswerToRepository(answerDescription,newAnswer)) {
-								System.out.println("Answer added successfully to both database and repository\n");
+								System.out.println("Answer added successfully to database and repository\n");
 							} else {
 								System.out.println("Answer added to database but already exists in repository\n");
 							}
@@ -173,13 +181,13 @@ public class Main {
 								System.out.println(INVALID);
 								break;
 							}
-							System.out.println("Answers thet already exist in the qustion: \n"
+							System.out.println("Answers that already exist in the qustion: \n"
 									+ ((MultipleChoiceQuestion) questionRepository.getQuestionByNumber(questienIndex2)).showeQuestion());
 							System.out.println(questionRepository.showAnswersFromRepository((MultipleChoiceQuestion) questionRepository.getQuestionByNumber(questienIndex2)));
-							System.out.println("Please write the number of the new answer");
+							System.out.println("Enter the number of the new answer");
 							int ansIndx2 = s.nextInt();
 							if (ansIndx2 > 0 && ansIndx2 <= questionRepository.getNumOfAnswers()) {
-								System.out.println("Please write the correctness of the answer (true/false)");
+								System.out.println("Is this answer correct? Write true/false ");
 								boolean correctness = s.nextBoolean();
 								if (questionRepository.addAnswerFromRepoToQusteion(questienIndex2, ansIndx2, correctness)) {
 
@@ -198,7 +206,7 @@ public class Main {
 										pstmt.setInt(1, q.getId());
 										pstmt.executeUpdate(); // Execute the update operation
 									}
-									System.out.println("Add successfully\n");
+									System.out.println("Added successfully\n");
 									break;
 								}
 							}
@@ -215,10 +223,10 @@ public class Main {
 						break;
 
 					case OP4:
-						System.out.println("Please write the question you would like to add");
+						System.out.println("Enter new question description");
 						s.nextLine();
 						String description = s.nextLine();
-						System.out.println("Please choose the difficulty level of the question");
+						System.out.println("Choose the difficulty level of the question");
 						Question.eDifficultyLevel[] allLevels = Question.eDifficultyLevel.values();
 						for (int i = 0; i < allLevels.length; i++) {
 							System.out.println(allLevels[i].ordinal()+1 + ") "+ allLevels[i].name());
@@ -234,8 +242,8 @@ public class Main {
 						Question.eDifficultyLevel theLevel = allLevels[levelInput - 1];
 
 						System.out.println("What type of question?\n"
-								+ "Multiple choice question press -->1\n"
-								+ "Open qustion press -->2\n");
+								+ "1) Multiple choice question\n"
+								+ "2) Open qustion press -->2\n");
 						int ans = s.nextInt(); //question type
 						try {
 							Connection conn = DatabaseManager.getConnection();
@@ -263,7 +271,7 @@ public class Main {
 									break;
 
 								case 2:
-									System.out.println("Please write the answer to the question");
+									System.out.println("Enter the correct answer description: ");
 									s.nextLine();
 									String answer = s.nextLine();
 									Answer newAns = new Answer(answer);
@@ -290,46 +298,12 @@ public class Main {
 
 
 
-//				case OP5:
-//					System.out.println("What is the number of the question in which you would like to delete an answer?");
-//
-//					int questienIndex6 = s.nextInt();
-//					Question q5 = questionRepository.getQuestionByNumber(questienIndex6);
-//					boolean outBounds = (questienIndex6<1 || questienIndex6>questionRepository.getNumOfAllQustiones());// if the question in the array out of bounds
-//					if(outBounds ||q5 instanceof OpenQuestion){//// Check q5 exist and not open question
-//						System.out.println(INVALID);
-//						break;
-//					}
-//					System.out.println("What is the number of the answer you would like to delete?");
-//					int ansIndx6 = s.nextInt();// Check Ans exist
-//					try {
-//						int goodID = ((MultipleChoiceQuestion) q5).getAnswers()[ansIndx6-1].getId();
-//						if (((MultipleChoiceQuestion) questionRepository.getQuestionByNumber(questienIndex6)).deleteAnswerOfQuestion(ansIndx6)) {
-//							String sql = "DELETE FROM multiple_choice_answers WHERE question_id = ? AND answer_id = ?";
-//							Connection conn = DatabaseManager.getConnection();
-//							try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//								pstmt.setInt(1, q5.getId());
-//								pstmt.setInt(2, goodID);
-//								pstmt.executeUpdate(); // Execute the delete operation
-//							}
-//							sql = "UPDATE multiplechoice SET number_of_answers = number_of_answers - 1 WHERE question_id = ?";
-//							try (PreparedStatement pstmt = conn.prepareStatement(sql)) {
-//								pstmt.setInt(1, q5.getId());
-//								pstmt.executeUpdate(); // Execute the update operation
-//							}
-//							System.out.println("Answer successfully deleted\n");
-//						} else
-//							System.out.println(INVALID);
-//					}
-//										catch (SQLException e) {
-//					System.out.println(e.getMessage());
-//				}
-//	
-//					break;
-						
+
 					case OP5:
-					    System.out.println("What is the number of the question in which you would like to delete an answer?");
-					    
+					    System.out.println("Which question's answer would you like to delete?");
+						for(int i=1; i<=questionRepository.numOfAllQustiones; i++) {
+							System.out.println(i + "." + questionRepository.getQuestionByNumber(i).getQuestionDescription());
+						}
 					    int questionIndex6 = s.nextInt();
 					    Question q5 = questionRepository.getQuestionByNumber(questionIndex6);
 					    boolean outOfBounds = (questionIndex6 < 1 ); // if the question in the array is out of bounds// || questionIndex6 > questionRepository.getNumOfAllQuestions()
@@ -339,9 +313,18 @@ public class Main {
 					        break;
 					    }
 					    
-					    System.out.println("What is the number of the answer you would like to delete?");
+					    System.out.println("Which answer to delete?");
+						try {
+							Connection conn = DatabaseManager.getConnection();
+							for (int i = 1; i <= repositoriesManager.countAnswersForQuestion(conn,q5); i++) {
+								System.out.println(i + "." + questionRepository.getQuestionByNumber(i).getQuestionDescription());
+							}
+						}catch(SQLException e){
+								System.out.println(e.getMessage());
+						}
 					    int ansIndex6 = s.nextInt(); // Check if the answer exists
-					    
+
+
 					    int goodID = ((MultipleChoiceQuestion) q5).getAnswers()[ansIndex6 - 1].getId();
 					    if (((MultipleChoiceQuestion) questionRepository.getQuestionByNumber(questionIndex6)).deleteAnswerOfQuestion(ansIndex6)) {
 					        System.out.println("Answer successfully deleted\n");
@@ -420,9 +403,9 @@ public class Main {
 	
 					break;
 					
-					/////// creating aouto exem 
+					/////// creating auto exam
 				case OP8:	
-					System.out.println("How many questions would you like on the exam? ");
+					System.out.println("How many questions would you like in the exam? ");
 					 amountOfQuestions = s.nextInt();// get the amount of question the user want
 					 amountOfExistingQustions = questionRepository.getNumOfAllQustiones();// get the amount of all
 					 
@@ -457,80 +440,85 @@ public class Main {
 						}
 
 						 break;
-						 case 9:
-							 System.out.println("Get Answers");
-							 try {
-								 Connection conn2 = DatabaseManager.getConnection();
-								 List<Answer> answersList = new ArrayList<>();
-									boolean flag = false;
-								 do {
-									AnswerSQL answerdao_2 = new AnswerSQL(conn2);
-									for(int i =0;i<21;i++) {
-										Answer answer = answerdao_2.findById(i + 1);  // Retrieve answer by ID (assuming IDs start at 1)
-										if (answer != null) {
-											answersList.add(answer);
-										}
+					 case 9:
+						 System.out.println("Get Answers");
+						 try {
+							 Connection conn2 = DatabaseManager.getConnection();
+							 List<Answer> answersList = new ArrayList<>();
+								boolean flag = false;
+							 do {
+								AnswerSQL ans_db2 = new AnswerSQL(conn2);
+								for(int i =0;i<21;i++) {
+									Answer answer = ans_db2.findById(i + 1);  // Retrieve answer by ID (assuming IDs start at 1)
+									if (answer != null) {
+										answersList.add(answer);
 									}
-									 for (Answer answer : answersList) {
-										 System.out.println(answer);
-									 }
-									flag = true;
-									conn2.close();
-								 }while(!flag);
-
-							 } catch (SQLException e) {
-								 e.printStackTrace();  // Handle the SQL exception
-							 }
-							 break;
-					case 10:
-						System.out.println("Save Answers");
-						try {
-							Connection conn2 = DatabaseManager.getConnection();
-							boolean flag = false;
-							do {
-								AnswerSQL answer_db = new AnswerSQL(conn2);
-								for(int i =0;i<questionRepository.numOfAllAnswers;i++) {
-									if(questionRepository.allAnswers[i] == null)
+									else{
+										System.out.println("Invalid answer ID");
 										break;
-									answer_db.save(questionRepository.allAnswers[i],questionRepository.getSubject());
+									}
 								}
+								 for (Answer answer : answersList) {
+									 System.out.println(answer);
+								 }
 								flag = true;
 								conn2.close();
-							}while(!flag);
+							 }while(!flag);
 
-						} catch (SQLException e) {
-							e.printStackTrace();  // Handle the SQL exception
-						}
+						 } catch (SQLException e) {
+							 e.printStackTrace();  // Handle the SQL exception
+						 }
+						 break;
+//					case 10:
+//						System.out.println("Save Answers");
+//						try {
+//							Connection conn2 = DatabaseManager.getConnection();
+//							boolean flag = false;
+//							do {
+//								AnswerSQL answer_db = new AnswerSQL(conn2);
+//								for(int i =0;i<questionRepository.numOfAllAnswers;i++) {
+//									if(questionRepository.allAnswers[i] == null)
+//										break;
+//									answer_db.save(questionRepository.allAnswers[i],questionRepository.getSubject());
+//								}
+//								flag = true;
+//								conn2.close();
+//							}while(!flag);
+//
+//						} catch (SQLException e) {
+//							e.printStackTrace();  // Handle the SQL exception
+//						}
 
-					 break;
-					case 11:
-						System.out.println("Saving Questions i hope");
-						try {
-							Connection conn2 = DatabaseManager.getConnection();
-							boolean flag = false;
-							do {
-								QuestionSQL answerdao_2 = new QuestionSQL(conn2);
-								for(int i =0;i<questionRepository.numOfAllQustiones;i++) {
-									if(questionRepository.allQuestions[i] == null)
-										break;
-									answerdao_2.save(questionRepository.allQuestions[i],questionRepository.getSubject());
-								}
-								flag = true;
-								conn2.close();
-							}while(!flag);
-
-						} catch (SQLException e) {
-							e.printStackTrace();  // Handle the SQL exception
-						}
-							break;
+//					 break;
+//					case 11:
+//						System.out.println("Saving Questions i hope");
+//						try {
+//							Connection conn2 = DatabaseManager.getConnection();
+//							boolean flag = false;
+//							do {
+//								QuestionSQL q_sql = new QuestionSQL(conn2);
+//								for(int i =0;i<questionRepository.numOfAllQustiones;i++) {
+//									if(questionRepository.allQuestions[i] == null)
+//										break;
+//									q_sql.save(questionRepository.allQuestions[i],questionRepository.getSubject());
+//								}
+//								flag = true;
+//								conn2.close();
+//							}while(!flag);
+//
+//						} catch (SQLException e) {
+//							e.printStackTrace();  // Handle the SQL exception
+//						}
+//							break;
 					case 12:
 						System.out.println("Trying to fetch a Question");
+						Random r =  new Random();
 						try {
 							Connection conn2 = DatabaseManager.getConnection();
 							boolean flag = false;
 							do {
-								QuestionSQL answerdao_2 = new QuestionSQL(conn2);
-								Question qTry = answerdao_2.findById(2);
+								QuestionSQL q_db = new QuestionSQL(conn2);
+								Question qTry = q_db.findById(r.nextInt(1,questionRepository.getNumOfAllQustiones()+1));
 								System.out.println(qTry);
 								conn2.close();
 								flag = true;
@@ -540,6 +528,29 @@ public class Main {
 							e.printStackTrace();  // Handle the SQL exception
 						}
 						break;
+
+				case 13:
+					try{
+						Connection conn = DatabaseManager.getConnection();
+						ExamSQL examdb = new ExamSQL(conn);
+						ArrayList<Integer> ids = new ArrayList<Integer>();
+						ids = examdb.getExamsIDs();
+						if (ids.size() == 0){
+							System.out.println("No Exams in Database. Generate an exam first.");
+						}
+						else{
+							System.out.println("Which Exam would you like to fetch?");
+							for(int id : ids){
+								System.out.println(id);
+							}
+							int choice_id = s.nextInt();
+							examdb.fetchAndDisplayExam(choice_id);
+						}
+
+					} catch(SQLException e){
+						System.out.println(e.getMessage());
+					}
+
 				case BACK:
 					break;
 	
@@ -553,20 +564,21 @@ public class Main {
 		}
 	}
 
-	private static void showManu() {
-		System.out.println("To show all questiones and answers) press--> 1");
-		System.out.println("To add new answer to repository) press--> 2");
-		System.out.println("To add an existing answer to question) press--> 3");
-		System.out.println("To add a new question) press--> 4");
-		System.out.println("To delete an answer to a question) press--> 5");
-		System.out.println("To delete a question) press--> 6");
-		System.out.println("To creat an exam manually) press--> 7");
-		System.out.println("To creat an exam automatically) press--> 8");
-		System.out.println("To get all answers to data base Press --> 9");
-		System.out.println("To save all answers to data base Press --> 10");
-		System.out.println("To save all questions to data base Press --> 11");
-		System.out.println("To get a question to data base Press --> 12");
-		System.out.println("To go back press 0");
+	private static void showMenu(String q_repo) {
+		q_repo= q_repo.toUpperCase();
+		System.out.println("Menu for " + "\u001B[1m" + q_repo+ "\u001B[0m" + " repository");
+		System.out.println("1 | SHOW ALL questiones and answers		");
+		System.out.println("2 | ADD NEW ANSWER to repository 		");
+		System.out.println("3 | ADD an EXISTING ANSWER to question	");
+		System.out.println("4 | ADD a NEW QUESTION	 				");
+		System.out.println("5 | DELETE an ANSWER to a question		");
+		System.out.println("6 | DELETE a QUESTION					");
+		System.out.println("7 | CREATE an exam MANUALLY				");
+		System.out.println("8 | CREATE an exam AUTOMATICALLY 		");
+		System.out.println("9 | GET ALL ANSWERS from Database 		");
+		System.out.println("12| FETCH a QUESTION from Database 		");
+		System.out.println("13| FETCH EXAM from Database 			");
+		System.out.println("0 | GO BACK								");
 
 	}
 

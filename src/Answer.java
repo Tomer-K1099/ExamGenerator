@@ -1,6 +1,6 @@
 //package db_proj;
 //////////HELLO JONATHAN MARGOLIN
-/// / whats uopppppp
+//// whats uopppppp
 import java.io.Serializable;
 
 public class Answer implements Serializable {
@@ -28,10 +28,6 @@ public class Answer implements Serializable {
 		if(answerDescription != null && !answerDescription.isEmpty()) 
 			this.answerStr = answerDescription;
 	}
-	
-
-
-
 
 	@Override
 	public String toString() {

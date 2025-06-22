@@ -1,6 +1,8 @@
 //package db_proj;
 
 import java.io.Serializable;
+import java.sql.Connection;
+import java.sql.SQLException;
 
 public abstract class Question implements Serializable {
 	private static final long serialVersionUID = -352234631959845953L;
@@ -66,7 +68,13 @@ public abstract class Question implements Serializable {
 	protected abstract String showeQuestion();
 	
 	public int getId() {
-		return id;
+		try (Connection conn = DatabaseManager.getConnection()) {
+			QuestionSQL q_db = new QuestionSQL(conn);
+			return q_db.getId(this);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}
 	}
 	// ADD SET ID
 	public void setId(int id) {

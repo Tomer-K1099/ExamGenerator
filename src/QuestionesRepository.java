@@ -20,7 +20,9 @@ public class QuestionesRepository implements Serializable{
 
 	}
 
-	public QuestionesRepository(String subject) {// defult constractor
+	public QuestionesRepository(String subject) {// default constructor
+		this.numOfAllQustiones = 0;
+		this.numOfAllAnswers = 0;
 		this.allQuestions = new Question[10];
 		this.allAnswers = new Answer[50];
 		this.setSubject(subject);
@@ -131,10 +133,10 @@ public class QuestionesRepository implements Serializable{
 				addAnswerToRepository("London");
 				addAnswerToRepository("Jerusalem");
 				addAnswerToRepository("Amsterdam");
-				addAnswerFromRepoToQusteion(1, 1, false);
-				addAnswerFromRepoToQusteion(1, 2, false);
-				addAnswerFromRepoToQusteion(1, 3, true);
-				addAnswerFromRepoToQusteion(1, 4, false);
+				addAnswerFromRepoToQusteion(9, 1, false);
+				addAnswerFromRepoToQusteion(9, 2, false);
+				addAnswerFromRepoToQusteion(9, 3, true);
+				addAnswerFromRepoToQusteion(9, 4, false);
 				
 				
 				
@@ -143,31 +145,31 @@ public class QuestionesRepository implements Serializable{
 				addAnswerToRepository("Beijing");
 				addAnswerToRepository("Seoul");
 				addAnswerToRepository("Bangkok");
-				addAnswerFromRepoToQusteion(2, 5, true);
-				addAnswerFromRepoToQusteion(2, 6, false);
-				addAnswerFromRepoToQusteion(2, 7, false);
-				addAnswerFromRepoToQusteion(2, 8, false);
+				addAnswerFromRepoToQusteion(10, 5, true);
+				addAnswerFromRepoToQusteion(10, 6, false);
+				addAnswerFromRepoToQusteion(10, 7, false);
+				addAnswerFromRepoToQusteion(10, 8, false);
 				
 				addMultipleChoiceQuestion("What is the capital city of Brazil?", Question.eDifficultyLevel.Hard);
 				addAnswerToRepository("Rio de Janeiro");
 				addAnswerToRepository("Sao Paulo");
 				addAnswerToRepository("Buenos Aires");
 				addAnswerToRepository(" Brasilia");
-				addAnswerFromRepoToQusteion(3, 9, false);
-				addAnswerFromRepoToQusteion(3, 10, false);
-				addAnswerFromRepoToQusteion(3, 11, false);
-				addAnswerFromRepoToQusteion(3, 12, true);
+				addAnswerFromRepoToQusteion(11, 9, false);
+				addAnswerFromRepoToQusteion(11, 10, false);
+				addAnswerFromRepoToQusteion(11, 11, false);
+				addAnswerFromRepoToQusteion(11, 12, true);
 				
 				addMultipleChoiceQuestion("What is the capital city of Australia?", Question.eDifficultyLevel.Hard);
 				addAnswerToRepository("Sydney");
 				addAnswerToRepository("Melbourne");
 				addAnswerToRepository("Canberra");
 				addAnswerToRepository("Perth");
-				addAnswerFromRepoToQusteion(4, 13, false);
-				addAnswerFromRepoToQusteion(4, 14, false);
-				addAnswerFromRepoToQusteion(4, 15, true);
-				addAnswerFromRepoToQusteion(4, 2, false);
-				addAnswerFromRepoToQusteion(4, 16, false);
+				addAnswerFromRepoToQusteion(12, 13, false);
+				addAnswerFromRepoToQusteion(12, 14, false);
+				addAnswerFromRepoToQusteion(12, 15, true);
+				addAnswerFromRepoToQusteion(12, 2, false);
+				addAnswerFromRepoToQusteion(12, 16, false);
 				
 				addOpenQuestion("What is the capital city of South Africa?", Question.eDifficultyLevel.Hard, "Pretoria");
 				addOpenQuestion("What is the capital city of Germany?", Question.eDifficultyLevel.Easy, "Berlin");
@@ -340,6 +342,10 @@ public class QuestionesRepository implements Serializable{
 
 	public String getSubject() {
 		return subject;
+	}
+
+	public Answer[] getAllAnswers() {
+		return allAnswers;
 	}
 
 	public void setSubject(String subject) {
