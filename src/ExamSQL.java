@@ -12,17 +12,15 @@ public class ExamSQL {
     }
 
     public void fetchAndDisplayExam(int test_id) throws SQLException {
-        int testId = 1; // Example test ID to fetch
 
-        String sql = "SELECT t.test_id, t.user_id, q.question_id, q.question_description, q.difficulty_level, q.subject "+
+        String query1 = "SELECT t.test_id, t.user_id, q.question_id, q.question_description, q.difficulty_level, q.subject, q.question_type "+
                       "FROM tests t "+
                       "JOIN test_questions tq ON t.test_id = tq.test_id "+
                       "JOIN questions q ON tq.question_id = q.question_id "+
                       "WHERE t.test_id = ? "+
                       "ORDER BY q.question_id";
 
-
-        try(PreparedStatement pstmt = this.conn.prepareStatement(sql)) {
+        try(PreparedStatement pstmt = this.conn.prepareStatement(query1)) {
             pstmt.setInt(1, test_id);
             ResultSet rs = pstmt.executeQuery();
             System.out.println("=== Test ID: " + test_id + " ===");
@@ -37,8 +35,29 @@ public class ExamSQL {
                 String desc = rs.getString("question_description");
                 String diff = rs.getString("difficulty_level");
                 String subj = rs.getString("subject");
+                String type = rs.getString("question_type");
 
                 System.out.printf("  [%d] (%s, %s) %s%n", qId, subj, diff, desc);
+
+                String query2;
+                if (type.equals("multiplechoice")){
+                    int counter=1;
+                    query2= "SELECT a.answer_description "+
+                            "FROM answers a "+
+                            "JOIN multiple_choice_answers mca ON mca.answer_id = a.answer_id "+
+                            "WHERE mca.question_id = ?";
+                    try(PreparedStatement pstmt2 = this.conn.prepareStatement(query2)) {
+                        pstmt2.setInt(1, qId);
+                        ResultSet rs2 = pstmt2.executeQuery();
+                        while(rs2.next()){
+                            String answer_description = rs2.getString("answer_description");
+                            System.out.println("        " + counter + ")  " +answer_description);
+                            counter++;
+                        }
+                    }
+
+                }
+
             }
             if (!hasRows) {
                 System.out.println("No questions found for this test.");

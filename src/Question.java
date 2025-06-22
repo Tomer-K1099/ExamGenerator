@@ -28,11 +28,6 @@ public abstract class Question implements Serializable {
 		
 	}
 	
-	
-	
-
-
-
 
 
 

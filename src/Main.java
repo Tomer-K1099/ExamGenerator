@@ -441,7 +441,7 @@ public class Main {
 
 						 break;
 					 case 9:
-						 System.out.println("Get Answers");
+						 System.out.println("Getting Answers from DB...");
 						 try {
 							 Connection conn2 = DatabaseManager.getConnection();
 							 List<Answer> answersList = new ArrayList<>();
@@ -469,49 +469,9 @@ public class Main {
 							 e.printStackTrace();  // Handle the SQL exception
 						 }
 						 break;
-//					case 10:
-//						System.out.println("Save Answers");
-//						try {
-//							Connection conn2 = DatabaseManager.getConnection();
-//							boolean flag = false;
-//							do {
-//								AnswerSQL answer_db = new AnswerSQL(conn2);
-//								for(int i =0;i<questionRepository.numOfAllAnswers;i++) {
-//									if(questionRepository.allAnswers[i] == null)
-//										break;
-//									answer_db.save(questionRepository.allAnswers[i],questionRepository.getSubject());
-//								}
-//								flag = true;
-//								conn2.close();
-//							}while(!flag);
-//
-//						} catch (SQLException e) {
-//							e.printStackTrace();  // Handle the SQL exception
-//						}
 
-//					 break;
-//					case 11:
-//						System.out.println("Saving Questions i hope");
-//						try {
-//							Connection conn2 = DatabaseManager.getConnection();
-//							boolean flag = false;
-//							do {
-//								QuestionSQL q_sql = new QuestionSQL(conn2);
-//								for(int i =0;i<questionRepository.numOfAllQustiones;i++) {
-//									if(questionRepository.allQuestions[i] == null)
-//										break;
-//									q_sql.save(questionRepository.allQuestions[i],questionRepository.getSubject());
-//								}
-//								flag = true;
-//								conn2.close();
-//							}while(!flag);
-//
-//						} catch (SQLException e) {
-//							e.printStackTrace();  // Handle the SQL exception
-//						}
-//							break;
-					case 12:
-						System.out.println("Trying to fetch a Question");
+					case 10:
+						System.out.println("Fetching a Question...");
 						Random r =  new Random();
 						try {
 							Connection conn2 = DatabaseManager.getConnection();
@@ -529,7 +489,7 @@ public class Main {
 						}
 						break;
 
-				case 13:
+				case 11:
 					try{
 						Connection conn = DatabaseManager.getConnection();
 						ExamSQL examdb = new ExamSQL(conn);
@@ -576,12 +536,9 @@ public class Main {
 		System.out.println("7 | CREATE an exam MANUALLY				");
 		System.out.println("8 | CREATE an exam AUTOMATICALLY 		");
 		System.out.println("9 | GET ALL ANSWERS from Database 		");
-		System.out.println("12| FETCH a QUESTION from Database 		");
-		System.out.println("13| FETCH EXAM from Database 			");
+		System.out.println("10| FETCH a QUESTION from Database 		");
+		System.out.println("11| FETCH EXAM from Database 			");
 		System.out.println("0 | GO BACK								");
 
 	}
-
-	
-
 }
